@@ -1,4 +1,4 @@
- 100import authMiddleware from "../middleware/auth.js";
+import authMiddleware from "../middleware/auth.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
@@ -28,7 +28,7 @@ const placeOrder = async (req, res) => {
                 product_data: {
                     name: item.name
                 },
-                unit_amount: item.price *100
+                unit_amount: item.price * 100
             },
             quantity: item.quantity
         }))
