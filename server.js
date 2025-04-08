@@ -19,7 +19,26 @@ app.use(bodyParser.json());
 
 //middleware
 app.use(express.json())
-app.use(cors())
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://darjeelingmomonz.vercel.app',
+  'https://darjeelingkitchenadm.vercel.app'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+
 
 
 //db connection
