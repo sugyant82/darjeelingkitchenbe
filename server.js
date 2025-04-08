@@ -7,11 +7,15 @@ import 'dotenv/config'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 
+import bodyParser from 'body-parser';
+import admin from './firebaseAdmin.js';
+
 
 //app config
 const app=express()
 const port =process.env.PORT
 
+app.use(bodyParser.json());
 
 //middleware
 app.use(express.json())
@@ -31,6 +35,21 @@ app.use("/api/order",orderRouter)
 app.get("/",(req,res)=>{
     res.send("Api is working")
 })
+
+app.post('/verifyToken', async (req, res) => {
+    const idToken = req.body.token;
+  
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+  
+      console.log('✅ Verified UID:', uid);
+      res.json({ status: 'success', uid, decodedToken });
+    } catch (error) {
+      console.error('❌ Token verification failed:', error);
+      res.status(401).json({ status: 'error', message: 'Invalid token' });
+    }
+  });
 
 app.listen(port, ()=>{
     console.log(`Server started on http://localhost:${port}`)
