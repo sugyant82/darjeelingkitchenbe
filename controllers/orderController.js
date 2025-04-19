@@ -2,40 +2,56 @@ import authMiddleware from "../middleware/auth.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
-import orderRouter from "../routes/orderRoute.js";
 import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const sendOrderConfirmationEmail = async (toEmail, name, orderId, orderItems, totalAmount) => {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail', // or use your SMTP provider
-      auth: {
-        user: process.env.SMTP_EMAIL,      // your email address
-        pass: process.env.SMTP_PASSWORD    // your email password or app-specific password
-      }
-    });
-  
-    const itemList = orderItems.map(item =>
-      `<li>${item.name} x ${item.quantity} = $${item.price * item.quantity}</li>`
-    ).join("");
-  
-    const mailOptions = {
-      from: `"Darjeeling Momo" <${process.env.SMTP_EMAIL}>`,
-      to: toEmail,
-      subject: "Your Order Confirmation",
-      html: `
-        <h3>Hi ${name},</h3>
-        <p>Thanks for your order. Your order ID is <strong>${orderId}</strong>.</p>
-        <ul>${itemList}</ul>
-        <p><strong>Total:</strong> $${totalAmount.toFixed(2)}</p>
-        <p>We will notify you once your order is on the way!</p>
-        <p>Cheers,<br>Darjeeling Momo Team</p>
-      `
-    };
-  
-    await transporter.sendMail(mailOptions);
+// Setup __dirname for ES Module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Read HTML email template
+const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-confirmation-template.html'), 'utf8');
+
+// Replace placeholders with real data
+function renderTemplate(template, data) {
+  return template
+    .replace('{{customerName}}', data.customerName)
+    .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
+    .replace('{{total}}', `$${data.total.toFixed(2)}`)
+    .replace('{{deliveryTime}}', data.deliveryTime);
+}
+
+// Send email function
+const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderItems, totalAmount) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD
+    }
+  });
+
+  const htmlContent = renderTemplate(emailTemplate, {
+    customerName,
+    orderItems,
+    total: totalAmount,
+    deliveryTime: "within 2 hours",
+  });
+
+  const mailOptions = {
+    from: `"Darjeeling Momo NZ" <${process.env.SMTP_EMAIL}>`,
+    to: toEmail,
+    subject: "Your Order is Confirmed - Darjeeling Momo NZ",
+    html: htmlContent
   };
+
+  await transporter.sendMail(mailOptions);
+};
 
 //placing user order for frontend
 const placeOrder = async (req, res) => {
@@ -64,7 +80,7 @@ const placeOrder = async (req, res) => {
                 `${req.body.address.firstName} ${req.body.address.lastName}`,
                 newOrder._id,
                 req.body.items,
-                parseFloat(req.body.amount) + parseFloat(deliveryCharge)
+                parseFloat(req.body.amount)
             );
         }
 
