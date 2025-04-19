@@ -28,8 +28,8 @@ function renderTemplate(template, data) {
     return template
         .replace('{{customerName}}', data.customerName)
         .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
-        .replace('{{deliveryCharge}}', data.deliveryCharge.toFixed(2))
-        .replace('{{total}}', data.total.toFixed(2))
+        .replace('{{deliveryCharge}}', deliveryCharge.toFixed(2))
+        .replace('{{total}}', total.toFixed(2))
         .replace('{{deliveryTime}}', data.deliveryTime)
         .replace('{{orderId}}', formattedOrderId);
 }
