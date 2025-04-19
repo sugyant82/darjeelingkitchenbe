@@ -18,6 +18,8 @@ const placeOrder = async (req, res) => {
             userId: req.body.userId,
             items: req.body.items,
             amount: req.body.amount,
+            orderTime: req.body.orderTime,
+            deliveryCharges: req.body.deliveryCharges,
             address: req.body.address,
         })
         await newOrder.save();
@@ -40,7 +42,7 @@ const placeOrder = async (req, res) => {
                 product_data: {
                     name: "Delivery Charges"
                 },
-                unit_amount: 10 * 100
+                unit_amount: req.body.deliveryCharges
             },
             quantity: 1
         })
