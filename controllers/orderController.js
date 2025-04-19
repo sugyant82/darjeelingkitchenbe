@@ -19,12 +19,17 @@ const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-co
 
 // Replace placeholders with real data
 function renderTemplate(template, data) {
+
+    // Extract last 5 characters and capitalize them
+  const formattedOrderId = data.orderId.slice(-5).toUpperCase();
+
     return template
       .replace('{{customerName}}', data.customerName)
       .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
       .replace('{{deliveryCharge}}', data.deliveryCharge.toFixed(2))
       .replace('{{total}}', data.total.toFixed(2))
-      .replace('{{deliveryTime}}', data.deliveryTime);
+      .replace('{{deliveryTime}}', data.deliveryTime)
+      .replace('{{orderId}}', formattedOrderId);
   }
 
   
@@ -44,6 +49,7 @@ const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderI
     total: totalAmount,
     deliveryCharge,
     deliveryTime: "within 2 hours",
+    orderId,
   });
 
   const mailOptions = {
