@@ -21,7 +21,11 @@ const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-co
 function renderTemplate(template, data) {
 
     // Extract last 5 characters and capitalize them
-    const formattedOrderId = data.orderId.toString().slice(-5).toUpperCase();
+    console.log("Original Order ID:", data.orderId);
+    console.log("Type of Order ID:", typeof data.orderId);
+    console.log("Stringified Order ID:", String(data.orderId));
+    const formattedOrderId = String(data.orderId).slice(-5).toUpperCase();
+
     const deliveryCharge = Number(data.deliveryCharge) || 0; // fallback to 0 if undefined
     const total = Number(data.total) || 0;
 
