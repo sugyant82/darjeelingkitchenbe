@@ -11,6 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const placeOrder = async (req, res) => {
 
     const frontend_url = "https://darjeelingmomonz.vercel.app";
+    const deliveryCharge = req.body.deliveryCharges? parseFloat(req.body.deliveryCharges).toFixed(2) : 0;
     //const frontend_url = //process.env.FE_URL;
 
     try {
@@ -19,7 +20,7 @@ const placeOrder = async (req, res) => {
             items: req.body.items,
             amount: req.body.amount,
             orderTime: req.body.orderTime,
-            deliveryCharges: req.body.deliveryCharges,
+            deliveryCharges: deliveryCharge,
             address: req.body.address,
         })
         await newOrder.save();
@@ -42,7 +43,7 @@ const placeOrder = async (req, res) => {
                 product_data: {
                     name: "Delivery Charges"
                 },
-                unit_amount: req.body.deliveryCharges
+                unit_amount: deliveryCharge * 100
             },
             quantity: 1
         })
