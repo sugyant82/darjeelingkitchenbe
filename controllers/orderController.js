@@ -19,15 +19,17 @@ const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-co
 
 // Replace placeholders with real data
 function renderTemplate(template, data) {
-  return template
-    .replace('{{customerName}}', data.customerName)
-    .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
-    .replace('{{total}}', `$${data.total.toFixed(2)}`)
-    .replace('{{deliveryTime}}', data.deliveryTime);
-}
+    return template
+      .replace('{{customerName}}', data.customerName)
+      .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
+      .replace('{{deliveryCharge}}', data.deliveryCharge.toFixed(2))
+      .replace('{{total}}', data.total.toFixed(2))
+      .replace('{{deliveryTime}}', data.deliveryTime);
+  }
 
+  
 // Send email function
-const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderItems, totalAmount) => {
+const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderItems, deliveryCharge, totalAmount) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -40,6 +42,7 @@ const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderI
     customerName,
     orderItems,
     total: totalAmount,
+    deliveryCharge,
     deliveryTime: "within 2 hours",
   });
 
@@ -80,6 +83,7 @@ const placeOrder = async (req, res) => {
                 `${req.body.address.firstName} ${req.body.address.lastName}`,
                 newOrder._id,
                 req.body.items,
+                deliveryCharge,
                 parseFloat(req.body.amount)
             );
         }
