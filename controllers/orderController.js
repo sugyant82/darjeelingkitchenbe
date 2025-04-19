@@ -22,44 +22,46 @@ function renderTemplate(template, data) {
 
     // Extract last 5 characters and capitalize them
     const formattedOrderId = data.orderId.toString().slice(-5).toUpperCase();
+    const deliveryCharge = Number(data.deliveryCharge) || 0; // fallback to 0 if undefined
+    const total = Number(data.total) || 0;
 
     return template
-      .replace('{{customerName}}', data.customerName)
-      .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
-      .replace('{{deliveryCharge}}', data.deliveryCharge.toFixed(2))
-      .replace('{{total}}', data.total.toFixed(2))
-      .replace('{{deliveryTime}}', data.deliveryTime)
-      .replace('{{orderId}}', formattedOrderId);
-  }
+        .replace('{{customerName}}', data.customerName)
+        .replace('{{orderItems}}', data.orderItems.map(item => `<li>${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`).join(''))
+        .replace('{{deliveryCharge}}', data.deliveryCharge.toFixed(2))
+        .replace('{{total}}', data.total.toFixed(2))
+        .replace('{{deliveryTime}}', data.deliveryTime)
+        .replace('{{orderId}}', formattedOrderId);
+}
 
-  
+
 // Send email function
 const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderItems, deliveryCharge, totalAmount) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_PASSWORD
-    }
-  });
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SMTP_EMAIL,
+            pass: process.env.SMTP_PASSWORD
+        }
+    });
 
-  const htmlContent = renderTemplate(emailTemplate, {
-    customerName,
-    orderItems,
-    total: totalAmount,
-    deliveryCharge,
-    deliveryTime: "within 2 hours",
-    orderId,
-  });
+    const htmlContent = renderTemplate(emailTemplate, {
+        customerName,
+        orderItems,
+        total: totalAmount,
+        deliveryCharge,
+        deliveryTime: "within 2 hours",
+        orderId,
+    });
 
-  const mailOptions = {
-    from: `"Darjeeling Momo NZ" <${process.env.SMTP_EMAIL}>`,
-    to: toEmail,
-    subject: "Your Order is Confirmed - Darjeeling Momo NZ",
-    html: htmlContent
-  };
+    const mailOptions = {
+        from: `"Darjeeling Momo NZ" <${process.env.SMTP_EMAIL}>`,
+        to: toEmail,
+        subject: "Your Order is Confirmed - Darjeeling Momo NZ",
+        html: htmlContent
+    };
 
-  await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 };
 
 //placing user order for frontend
