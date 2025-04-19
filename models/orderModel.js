@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
     status:{type:String, default:"Preparing Food"},
     date: {type:Date,default:Date.now()},
     payment:{type:Boolean, default:false},
-    orderTime: {type: String, required:true},
+    orderTime: {type:Date,default:Date.now()},
     deliveryCharges: {type:Number, required: true}
 })
 
