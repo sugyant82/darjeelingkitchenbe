@@ -21,7 +21,7 @@ const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-co
 function renderTemplate(template, data) {
 
     // Extract last 5 characters and capitalize them
-  const formattedOrderId = data.orderId.slice(-5).toUpperCase();
+    const formattedOrderId = data.orderId.toString().slice(-5).toUpperCase();
 
     return template
       .replace('{{customerName}}', data.customerName)
