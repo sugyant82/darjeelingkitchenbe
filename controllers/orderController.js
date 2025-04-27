@@ -71,7 +71,7 @@ const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderI
 //placing user order for frontend
 const placeOrder = async (req, res) => {
 
-    const frontend_url = "https://darjeelingmomonz.vercel.app";
+    const frontend_url = "https://darjeelingmomonz.com";
     const deliveryCharge = req.body.deliveryCharges ? parseFloat(req.body.deliveryCharges).toFixed(2) : 0;
     //const frontend_url = //process.env.FE_URL;
 
