@@ -113,10 +113,16 @@ const placeOrder = async (req, res) => {
             orderTime: req.body.orderTime,
             deliveryCharges: deliveryCharge,
             address: req.body.address,
+            paymentMethod: "stripe",
         })
         await newOrder.save();
         await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
-
+    }
+    catch{
+        console.log(error);
+        res.json({ success: false, message: "Error Inserting recod into database" })
+    }
+    try {
         // Send email confirmation
         const user = await userModel.findById(req.body.userId);
         if (user && user.email) {
