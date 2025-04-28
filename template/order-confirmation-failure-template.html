@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Darjeeling Momo NZ - Payment Failure</title>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0"
+          style="background-color: #ffffff; border-radius: 10px; font-family: Arial, sans-serif;">
+          <!-- Header -->
+          <tr style="background-color: #B83E26; color: #fff;">
+            <td align="center" style="padding: 20px;">
+              <img src="https://darjeelingmomonz.com/email_logo.png" alt="Darjeeling Momo NZ" width="120"
+                style="display:block; width:180px" />
+              <h2 style="margin: 10px 0 0; font-family: Georgia, serif; color: #fff;">Darjeeling Momo NZ</h2>
+              <p style="margin: 5px 0 0; font-size: 14px;">Payment Failure for Order No {{orderId}}</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 30px; color: #333;">
+              <h3 style="margin-top: 0;">Namaste & Thank You, {{customerName}}!</h3>
+              <p>Unfortunately, there was an issue processing the payment for your order with <strong>Darjeeling Momo NZ</strong>.</p>
+              <h3 style="margin: 0 0 10px;">Order Details</h3>
+              <p><strong>Order ID:</strong> {{orderId}}</p>
+              <p><strong>Total Amount:</strong> ${{total}}</p>
+              <p><strong>Error Code:</strong> {{errorCode}}</p>
+              <p><strong>Error Message:</strong> {{errorMessage}}</p>
+
+              <p style="margin-top: 10px;">Please double-check your payment method and try again. If the issue persists, feel free to contact us for further assistance.</p>
+              <p>If you have any questions or concerns, don’t hesitate to reach out to us at <strong>darjeelinglimitednz@gmail.com</strong> or <strong>+64-278024729.</strong></p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr style="background-color: #fafafa;">
+            <td align="center" style="padding: 20px; font-size: 12px; color: #888;">
+              <p><strong>Darjeeling Momo NZ</strong><br>Manurewa, Auckland 2102 · darjeelinglimitednz@gmail.com</p>
+              <p>Follow us on
+                <a href="https://www.facebook.com/profile.php?id=61573682579457" style="color: #B83E26; text-decoration: none;">Facebook</a>
+                ·
+                <a href="https://www.instagram.com/darjeelingmomonz/" style="color: #B83E26; text-decoration: none;">Instagram</a>
+                ·
+                <a href="https://www.tiktok.com/@darjeelingkitchennz" style="color: #B83E26; text-decoration: none;">TikTok</a>
+              </p>
+            </td>
+          </tr>
+          <!-- Footer Disclaimer -->
+          <tr style="background-color: #f2f2f2;">
+            <td style="padding: 20px; font-size: 12px; color: #B83E26; text-align: center;">
+              <p style="margin-top: 5px; color: #B83E26; "><strong>Disclaimer:</strong> Prices and availability are subject to change
+                without prior notice. For any issues with your order, please contact us through our website or social
+                media.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

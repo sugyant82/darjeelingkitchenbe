@@ -16,6 +16,7 @@ const __dirname = dirname(__filename);
 
 // Read HTML email template
 const emailTemplate = fs.readFileSync(path.join(__dirname, '../template/order-confirmation-template.html'), 'utf8');
+const emailTemplateOrderFailed = fs.readFileSync(path.join(__dirname, '../template/order-confirmation-failure-template.html'), 'utf8');
 
 // Replace placeholders with real data
 function renderTemplate(template, data) {
@@ -62,6 +63,35 @@ const sendOrderConfirmationEmail = async (toEmail, customerName, orderId, orderI
         from: `"Darjeeling Momo NZ" <${process.env.SMTP_EMAIL}>`,
         to: toEmail,
         subject: "Your Order is Confirmed - Darjeeling Momo NZ",
+        html: htmlContent
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+// Send email function
+const sendOrderPaymentFailednEmail = async (toEmail, customerName, orderId, orderItems, deliveryCharge, totalAmount, error) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SMTP_EMAIL,
+            pass: process.env.SMTP_PASSWORD
+        }
+    });
+
+    const htmlContent = renderTemplate(emailTemplateOrderFailed, {
+        customerName,
+        orderItems,
+        total: totalAmount,
+        orderId,
+        errorMessage:error.message,
+        errorCode:error.code,
+    });
+
+    const mailOptions = {
+        from: `"Darjeeling Momo NZ" <${process.env.SMTP_EMAIL}>`,
+        to: toEmail,
+        subject: "Payment Failed for Your Order - Darjeeling Momo NZ",
         html: htmlContent
     };
 
@@ -133,6 +163,17 @@ const placeOrder = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error" })
+        // Send email for failed payment
+        if (user && user.email) {
+            await sendOrderPaymentFailednEmail(
+                user.email,
+                `${req.body.address.firstName} ${req.body.address.lastName}`,
+                newOrder._id,
+                req.body.items,
+                parseFloat(req.body.amount),
+                error
+            );
+        }
     }
 }
 
