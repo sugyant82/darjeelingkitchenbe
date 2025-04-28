@@ -170,6 +170,7 @@ const placeOrder = async (req, res) => {
         console.log(error);
         res.json({ success: false, message: "Error" })
         // Send email for failed payment
+        const user = await userModel.findById(req.body.userId);
         if (user && user.email) {
             await sendOrderPaymentFailednEmail(
                 user.email,
