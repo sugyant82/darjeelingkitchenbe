@@ -105,8 +105,11 @@ const placeOrder = async (req, res) => {
     const deliveryCharge = req.body.deliveryCharges ? parseFloat(req.body.deliveryCharges).toFixed(2) : 0;
     //const frontend_url = //process.env.FE_URL;
 
+    let newOrder; // Declare outside
+    let user;     // Declare outside
+
     try {
-        const newOrder = new orderModel({
+           newOrder = new orderModel({
             userId: req.body.userId,
             items: req.body.items,
             amount: req.body.amount,
@@ -117,14 +120,9 @@ const placeOrder = async (req, res) => {
         })
         await newOrder.save();
         await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
-    }
-    catch{
-        console.log(error);
-        res.json({ success: false, message: "Error Inserting recod into database" })
-    }
-    try {
+    
         // Send email confirmation
-        const user = await userModel.findById(req.body.userId);
+        user = await userModel.findById(req.body.userId);
         if (user && user.email) {
             await sendOrderConfirmationEmail(
                 user.email,
@@ -170,7 +168,6 @@ const placeOrder = async (req, res) => {
         console.log(error);
         res.json({ success: false, message: "Error" })
         // Send email for failed payment
-        const user = await userModel.findById(req.body.userId);
         if (user && user.email) {
             await sendOrderPaymentFailednEmail(
                 user.email,
