@@ -165,20 +165,25 @@ const placeOrder = async (req, res) => {
 
         res.json({ success: true, session_url: session.url });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" })
-        // Send email for failed payment
+        console.log("error during stripe validation: ",error);
         if (user && user.email) {
-            await sendOrderPaymentFailednEmail(
-                user.email,
-                `${req.body.address.firstName} ${req.body.address.lastName}`,
-                newOrder._id,
-                req.body.items,
-                parseFloat(req.body.amount),
-                error
-            );
+            try {
+                await sendOrderPaymentFailednEmail(
+                    user.email,
+                    `${req.body.address.firstName} ${req.body.address.lastName}`,
+                    newOrder?._id,
+                    req.body.items,
+                    parseFloat(req.body.amount),
+                    error
+                );
+            } catch (emailError) {
+                console.log("Failed to send failure email:", emailError);
+            }
         }
+    
+        res.status(500).json({ success: false, message: "Error" });
     }
+    
 }
 
 const verifyOrder = async (req, res) => {
