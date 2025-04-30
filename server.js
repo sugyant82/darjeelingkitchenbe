@@ -9,6 +9,7 @@ import orderRouter from './routes/orderRoute.js'
 
 import bodyParser from 'body-parser';
 import admin from './firebaseAdmin.js';
+import stripeWebhookRouter from './routes/stripeWebhookRoute.js'
 
 
 //app config
@@ -51,6 +52,7 @@ app.use("/images",express.static('uploads'))
 app.use("/api/user",userRouter)
 app.use("/api/cart",cartRouter)
 app.use("/api/order",orderRouter)
+app.use("/api/stripe",stripeWebhookRouter)
 
 app.get("/",(req,res)=>{
     res.send("Api is working")

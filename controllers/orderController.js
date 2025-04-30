@@ -100,16 +100,12 @@ const sendOrderPaymentFailednEmail = async (toEmail, customerName, orderId, orde
 
 //placing user order for frontend
 const placeOrder = async (req, res) => {
-
     const frontend_url = "https://darjeelingmomonz.com";
     const deliveryCharge = req.body.deliveryCharges ? parseFloat(req.body.deliveryCharges).toFixed(2) : 0;
-    //const frontend_url = //process.env.FE_URL;
-
-    let newOrder; // Declare outside
-    let user;     // Declare outside
 
     try {
-           newOrder = new orderModel({
+        // Step 1: Save order as "pending" (not confirmed yet)
+        const newOrder = new orderModel({
             userId: req.body.userId,
             items: req.body.items,
             amount: req.body.amount,
@@ -117,74 +113,51 @@ const placeOrder = async (req, res) => {
             deliveryCharges: deliveryCharge,
             address: req.body.address,
             paymentMethod: "stripe",
-        })
+            paymentStatus: "pending" // add this field in schema if not present
+        });
         await newOrder.save();
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
-    
-        // Send email confirmation
-        user = await userModel.findById(req.body.userId);
-        if (user && user.email) {
-            await sendOrderConfirmationEmail(
-                user.email,
-                `${req.body.address.firstName} ${req.body.address.lastName}`,
-                newOrder._id,
-                req.body.items,
-                deliveryCharge,
-                parseFloat(req.body.amount)
-            );
-        }
 
-        const line_items = req.body.items.map((item) => ({
+        // Step 2: Prepare Stripe line items
+        const line_items = req.body.items.map(item => ({
             price_data: {
                 currency: "nzd",
-                product_data: {
-                    name: item.name
-                },
+                product_data: { name: item.name },
                 unit_amount: item.price * 100
             },
             quantity: item.quantity
-        }))
+        }));
 
+        // Add delivery charges
         line_items.push({
             price_data: {
                 currency: "nzd",
-                product_data: {
-                    name: "Delivery Charges"
-                },
+                product_data: { name: "Delivery Charges" },
                 unit_amount: deliveryCharge * 100
             },
             quantity: 1
-        })
+        });
 
+        // Step 3: Create Stripe Checkout session
         const session = await stripe.checkout.sessions.create({
-            line_items: line_items,
+            line_items,
             mode: 'payment',
             success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-            cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`
-        })
-
-        res.json({ success: true, session_url: session.url });
-    } catch (error) {
-        console.log("error during stripe validation: ",error);
-        if (user && user.email) {
-            try {
-                await sendOrderPaymentFailednEmail(
-                    user.email,
-                    `${req.body.address.firstName} ${req.body.address.lastName}`,
-                    newOrder?._id,
-                    req.body.items,
-                    parseFloat(req.body.amount),
-                    error
-                );
-            } catch (emailError) {
-                console.log("Failed to send failure email:", emailError);
+            cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
+            metadata: {
+                orderId: newOrder._id.toString(),
+                userId: req.body.userId
             }
-        }
-    
-        res.status(500).json({ success: false, message: "Error" });
+        });
+
+        // Step 4: Return Stripe session URL to frontend
+        res.json({ success: true, session_url: session.url });
+
+    } catch (error) {
+        console.error("Stripe order placement error:", error);
+        res.status(500).json({ success: false, message: "Something went wrong while placing the order." });
     }
-    
-}
+};
+
 
 const verifyOrder = async (req, res) => {
     const { orderId, success } = req.body;
