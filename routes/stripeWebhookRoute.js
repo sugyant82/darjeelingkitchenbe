@@ -84,7 +84,7 @@ const sendFailureEmail = async (toEmail, customerName, orderId, orderItems, deli
 };
 
 // Webhook endpoint
-stripeWebhookRouter.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+stripeWebhookRouter.post('/', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
 

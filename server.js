@@ -16,6 +16,10 @@ import stripeWebhookRouter from './routes/stripeWebhookRoute.js'
 const app=express()
 const port =process.env.PORT
 
+
+// ✅ Stripe Webhook must be registered BEFORE express.json() runs
+app.use("/api/stripe/webhook", express.raw({ type: "application/json" }), stripeWebhookRouter);
+
 app.use(bodyParser.json());
 
 //middleware
@@ -52,7 +56,7 @@ app.use("/images",express.static('uploads'))
 app.use("/api/user",userRouter)
 app.use("/api/cart",cartRouter)
 app.use("/api/order",orderRouter)
-app.use("/api/stripe",stripeWebhookRouter)
+//app.use("/api/stripe",stripeWebhookRouter)
 
 app.get("/",(req,res)=>{
     res.send("Api is working")
