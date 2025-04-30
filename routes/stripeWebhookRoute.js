@@ -102,10 +102,6 @@ stripeWebhookRouter.post('/', async (req, res) => {
             console.log("orderId is : ", orderId);
             const order = await orderModel.findById(orderId);
 
-            console.log("Order status before update is : ", order.status);
-            console.log("Order firstNAme : ", order.address.firstName);
-            console.log("Order amount : ", order.amount);
-
             if (!order) return res.status(404).send("Order not found");
 
             const user = await userModel.findById(order.userId);
