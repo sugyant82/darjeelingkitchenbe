@@ -99,11 +99,19 @@ stripeWebhookRouter.post('/webhook', express.raw({ type: 'application/json' }), 
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
             const orderId = session.metadata.orderId;
+            console.log("orderId is : ", orderId);
             const order = await orderModel.findById(orderId);
+
+            console.log("Order status before update is : ", order.status);
+            console.log("Order firstNAme : ", order.address.firstName);
+            console.log("Order amount : ", order.amount);
+
             if (!order) return res.status(404).send("Order not found");
 
             const user = await userModel.findById(order.userId);
             if (user && user.email) {
+                console.log("user email is is : ", user.email);
+                
                 await sendSuccessEmail(user.email,
                     `${order.address.firstName} ${order.address.lastName}`,
                     orderId, order.items, order.deliveryCharges, order.amount);
