@@ -169,7 +169,8 @@ const verifyOrder = async (req, res) => {
             res.json({ success: true, message: "Paid" })
         }
         else {
-            await orderModel.findByIdAndDelete(orderId);
+            await orderModel.findByIdAndUpdate(orderId, { payment: 'failed' });
+            //await orderModel.findByIdAndDelete(orderId);
             res.json({ success: false, message: "failed" })
         }
     } catch (error) {
