@@ -117,10 +117,12 @@ stripeWebhookRouter.post('/', async (req, res) => {
             await order.save();
         }
 
-        if (event.type === 'checkout.session.expired' || event.type === 'payment_intent.payment_failed') {
+        if (event.type === 'payment_intent.payment_failed') {
             const session = event.data.object;
             const orderId = session.metadata?.orderId;
             if (!orderId) return res.status(200).send(); // not our order
+
+            console.log("payment intent failed for orderId: ", orderId);
 
             const order = await orderModel.findById(orderId);
             const user = await userModel.findById(order.userId);

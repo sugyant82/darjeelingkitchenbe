@@ -115,6 +115,7 @@ const placeOrder = async (req, res) => {
             paymentMethod: "stripe",
             payment: 'unpaid'
         });
+        console.log("attempting to save order: ", newOrder.toObject());
         await newOrder.save();
 
         // Step 2: Prepare Stripe line items
