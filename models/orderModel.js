@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema({
     address:{type:Object, required:true},
     status:{type:String, default:"Preparing Food"},
     date: {type:Date,default:Date.now()},
-    payment:{type:Boolean, default:false},
+    payment:{type: String, required:true},
     paymentMethod:{type:String, default:"Cash"},
     orderTime: {type:Date,default:Date.now()},
     deliveryCharges: {type:Number, required: true}

@@ -110,14 +110,14 @@ stripeWebhookRouter.post('/', async (req, res) => {
 
             const user = await userModel.findById(order.userId);
             if (user && user.email) {
-                console.log("user email is is : ", user.email);
+                console.log("user email is : ", user.email);
                 
                 await sendSuccessEmail(user.email,
                     `${order.address.firstName} ${order.address.lastName}`,
                     orderId, order.items, order.deliveryCharges, order.amount);
             }
 
-            order.status = 'paid';
+            order.payment = 'paid';
             await order.save();
         }
 
@@ -135,7 +135,7 @@ stripeWebhookRouter.post('/', async (req, res) => {
                     { message: 'Your payment was not successful.', code: 'FAILED' });
             }
 
-            order.status = 'payment_failed';
+            order.payment = 'failed';
             await order.save();
         }
 

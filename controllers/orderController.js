@@ -113,7 +113,7 @@ const placeOrder = async (req, res) => {
             deliveryCharges: deliveryCharge,
             address: req.body.address,
             paymentMethod: "stripe",
-            paymentStatus: "pending" // add this field in schema if not present
+            payment: 'unpaid'
         });
         await newOrder.save();
 
@@ -164,12 +164,12 @@ const verifyOrder = async (req, res) => {
 
     try {
         if (success == "true") {
-            await orderModel.findByIdAndUpdate(orderId, { payment: true });
+            await orderModel.findByIdAndUpdate(orderId, { payment: 'paid' });
             res.json({ success: true, message: "Paid" })
         }
         else {
             await orderModel.findByIdAndDelete(orderId);
-            res.json({ success: false, message: "Not Paid" })
+            res.json({ success: false, message: "failed" })
         }
     } catch (error) {
         console.log(error);
